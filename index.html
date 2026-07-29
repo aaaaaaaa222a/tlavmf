@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>트위터 자기소개 카드 에디터</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gowun+Dodum&family=Gaegu:wght@400;700&family=Jua&family=Space+Grotesk:wght@400;500;700&family=Nanum+Myeongjo:wght@400;700&display=swap');
+
+  /* ---- 사용자 지정 폰트 (눈누 등 무료 한글 폰트) ---- */
+  @import url('https://cdn.jsdelivr.net/gh/sunghyunzz/eulyoo1945/eulyoo1945.css');
+  @import url('https://cdn.jsdelivr.net/gh/MonadABXY/mona-font/web/mona.css');
+  @font-face{ font-family:'Yidstreet'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2110@1.0/YdestreetL.woff2') format('woff2'); font-weight:300; font-display:swap; }
+  @font-face{ font-family:'Yidstreet'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2110@1.0/YdestreetB.woff2') format('woff2'); font-weight:700; font-display:swap; }
+  @font-face{ font-family:'PyeojinGothic'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2504-1@1.0/PyeojinGothic-Regular.woff2') format('woff2'); font-weight:400; font-display:swap; }
+  @font-face{ font-family:'PyeojinGothic'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2504-1@1.0/PyeojinGothic-Bold.woff2') format('woff2'); font-weight:700; font-display:swap; }
+  @font-face{ font-family:'HsGlidingSerif'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2604-1@1.0/HSHwalkongSerif-Regular.woff2') format('woff2'); font-weight:normal; font-display:swap; }
+  @font-face{ font-family:'KerisKedyuche'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2601-3@1.0/KERISKEDU_R.woff2') format('woff2'); font-weight:400; font-display:swap; }
+  @font-face{ font-family:'KerisKedyuche'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2601-3@1.0/KERISKEDU_B.woff2') format('woff2'); font-weight:700; font-display:swap; }
+  @font-face{ font-family:'ChosunIlboMyungjo'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff'); font-weight:normal; font-display:swap; }
+  @font-face{ font-family:'MunmakchoHaeban'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/2604-1@1.0/MUNMAK_HAEBANCHE.woff2') format('woff2'); font-weight:normal; font-display:swap; }
+
+  :root{
+    --ui-ink:#2b2530; --ui-sub:#8b8391; --ui-panel:#ffffff; --ui-line:#ece6ee;
+    --ui-accent:#ef5f83; --ui-accent-soft:#fde3ea; --ui-accent-deep:#c73f66;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: linear-gradient(160deg,#f6f1f6 0%, #eef1fa 55%, #f4eef4 100%);
+    font-family:'Gowun Dodum', 'Pretendard', -apple-system, sans-serif;
+    color:var(--ui-ink);
+    min-height:100vh;
+  }
+
+  .app{ display:grid; grid-template-columns: 400px 1fr; gap:0; min-height:100vh; }
+
+  /* ---------- LEFT: EDITOR PANEL ---------- */
+  .editor{
+    background:var(--ui-panel); border-right:1px solid var(--ui-line);
+    padding:28px 24px 80px; overflow-y:auto; max-height:100vh;
+  }
+  .editor h1{ font-family:'Do Hyeon', sans-serif; font-size:22px; margin:0 0 4px; color:var(--ui-accent-deep); }
+  .editor .lead{ font-size:12.5px; color:var(--ui-sub); margin:0 0 22px; line-height:1.5; }
+
+  .section{ margin-bottom:22px; padding-bottom:20px; border-bottom:1px dashed var(--ui-line); }
+  .section:last-of-type{ border-bottom:none; }
+  .section-title{ display:flex; align-items:center; gap:8px; font-family:'Do Hyeon', sans-serif; font-size:14.5px; margin-bottom:4px; }
+  .section-title .bar{ width:5px; height:15px; border-radius:3px; background:var(--ui-accent); display:inline-block; }
+  .section-hint{ font-size:11px; color:var(--ui-sub); line-height:1.5; margin:2px 0 12px 13px; }
+
+  label.field{ display:block; font-size:11.5px; color:var(--ui-sub); margin:10px 0 5px; font-weight:600; }
+  input[type=text], textarea, select{
+    width:100%; border:1.5px solid var(--ui-line); background:#fdfbfd; border-radius:10px;
+    padding:9px 11px; font-family:inherit; font-size:13.5px; color:var(--ui-ink); resize:vertical;
+    transition:border-color .15s;
+  }
+  select{ cursor:pointer; }
+  input[type=text]:focus, textarea:focus, select:focus{ outline:none; border-color:var(--ui-accent); background:#fff; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  .filebtn{
+    display:flex; align-items:center; gap:10px; border:1.5px dashed var(--ui-line); border-radius:10px;
+    padding:9px 11px; font-size:12.5px; color:var(--ui-sub); cursor:pointer; background:#fdfbfd;
+  }
+  .filebtn:hover{ border-color:var(--ui-accent); color:var(--ui-accent-deep); }
+  .filebtn input{ display:none; }
+  .thumb{ width:34px; height:34px; border-radius:8px; object-fit:cover; border:1px solid var(--ui-line); flex-shrink:0; background:#f2eef2; }
+
+  .chiplist{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .chip{ display:flex; align-items:center; gap:6px; background:var(--ui-accent-soft); color:var(--ui-accent-deep); border-radius:999px; padding:5px 6px 5px 12px; font-size:12px; font-weight:600; }
+  .chip button{ border:none; background:rgba(255,255,255,.6); color:var(--ui-accent-deep); width:18px;height:18px;border-radius:50%; cursor:pointer; font-size:11px; line-height:1; display:flex; align-items:center; justify-content:center; }
+  .addrow{ display:flex; gap:6px; margin-top:8px; }
+  .addrow input{ flex:1; }
+  .btn{ border:none; border-radius:9px; padding:8px 13px; font-size:12.5px; font-weight:700; cursor:pointer; background:var(--ui-accent); color:#fff; white-space:nowrap; transition:filter .15s, transform .1s; }
+  .btn:hover{ filter:brightness(1.06); }
+  .btn:active{ transform:scale(0.97); }
+  .btn.ghost{ background:#fff; color:var(--ui-accent-deep); border:1.5px solid var(--ui-accent-soft); }
+  .btn.small{ padding:6px 10px; font-size:11.5px; }
+  .btn.block{ width:100%; margin-top:10px; }
+
+  .listitem{ display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; }
+  .rte-wrap{ flex:1; min-width:0; }
+  .rte-toolbar{ display:flex; gap:4px; margin-bottom:5px; }
+  .rte-toolbar button{ border:1px solid var(--ui-line); background:#fff; width:26px; height:24px; border-radius:6px; font-size:11px; cursor:pointer; color:var(--ui-ink); }
+  .rte-toolbar button:hover{ background:var(--ui-accent-soft); border-color:var(--ui-accent-soft); }
+  .rte-color{ width:26px; height:24px; border:1px solid var(--ui-line); border-radius:6px; padding:1px; cursor:pointer; background:#fff; }
+  .rte{ min-height:38px; border:1.5px solid var(--ui-line); background:#fdfbfd; border-radius:10px; padding:8px 10px; font-size:13px; line-height:1.55; outline:none; }
+  .rte:focus{ border-color:var(--ui-accent); background:#fff; }
+  .rte:empty::before{ content:attr(data-placeholder); color:#bbb; }
+  .iconbtn{ border:none; background:#f4eef4; color:var(--ui-sub); width:30px;height:30px;border-radius:8px; cursor:pointer; flex-shrink:0; font-size:14px; }
+  .iconbtn:hover{ background:var(--ui-accent-soft); color:var(--ui-accent-deep); }
+
+  .pair-card-edit{ border:1.5px solid var(--ui-line); border-radius:12px; padding:12px; margin-bottom:12px; background:#fdfbfd; position:relative; }
+  .pair-card-edit .removepair{ position:absolute; top:8px; right:8px; }
+  .pair-grid-fields{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;}
+
+  .sticker-edit-card{ border:1.5px solid var(--ui-line); border-radius:12px; padding:10px 12px 12px; margin-bottom:10px; background:#fdfbfd; }
+  .sticker-edit-card.is-selected{ border-color:var(--ui-accent); background:#fff9fb; }
+  .sticker-edit-top{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .sticker-edit-top img{ width:38px; height:38px; border-radius:8px; object-fit:cover; border:1px solid var(--ui-line); flex-shrink:0; cursor:pointer; }
+  .sticker-edit-top .lbl{ font-size:12px; font-weight:700; flex:1; cursor:pointer; }
+  .sticker-edit-actions{ display:flex; gap:5px; flex-shrink:0; }
+  .sticker-edit-actions button{ border:none; background:#f4eef4; color:var(--ui-sub); width:24px;height:24px;border-radius:7px; cursor:pointer; font-size:11px; }
+  .sticker-edit-actions button:hover{ background:var(--ui-accent-soft); color:var(--ui-accent-deep); }
+  .sticker-edit-row{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+  .sticker-edit-row label{ font-size:11px; color:var(--ui-sub); width:34px; flex-shrink:0; }
+  .sticker-edit-row input[type=range]{ flex:1; accent-color:var(--ui-accent); }
+
+  .empty-note{ font-size:12px; color:var(--ui-sub); text-align:center; padding:14px; border:1.5px dashed var(--ui-line); border-radius:12px; }
+
+  .export-bar{ position:sticky; bottom:-1px; background:var(--ui-panel); padding-top:14px; margin-top:6px; }
+
+  /* ---- 테마 스와치 ---- */
+  .theme-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .colorpick{ width:100%; height:36px; border:1.5px solid var(--ui-line); border-radius:8px; cursor:pointer; padding:2px; background:#fdfbfd; }
+  .theme-swatch{
+    border:2px solid var(--ui-line); border-radius:12px; padding:10px; cursor:pointer; text-align:left;
+    background:#fdfbfd; transition:border-color .15s;
+  }
+  .theme-swatch.active{ border-color:var(--ui-accent); }
+  .theme-swatch .sw-bar{ height:20px; border-radius:6px; margin-bottom:7px; }
+  .theme-swatch .sw-name{ font-size:11.5px; font-weight:700; color:var(--ui-ink); }
+  .sw-modern{ background:linear-gradient(90deg,#fff 50%,#161616 50%); border:1px solid #1c1c1c; }
+  .sw-pastel{ background:linear-gradient(135deg,#ffd9e6,#ffe6ac,#c9ecff); }
+  .sw-diary{ background:#f7f2e9; border:1px solid #c9bda3; }
+  .sw-dark{ background:linear-gradient(135deg,#4b2e6b,#141018 70%); }
+
+  .layout-grid{ display:flex; gap:8px; }
+  .layout-btn{
+    flex:1; border:2px solid var(--ui-line); border-radius:12px; padding:12px 8px; cursor:pointer;
+    background:#fdfbfd; font-size:12px; font-weight:700; color:var(--ui-sub); text-align:center;
+  }
+  .layout-btn.active{ border-color:var(--ui-accent); color:var(--ui-accent-deep); background:#fff9fb; }
+  .layout-btn .shape{ margin:0 auto 6px; border:2px solid var(--ui-sub); border-radius:3px; }
+  .layout-btn.active .shape{ border-color:var(--ui-accent); }
+  .shape-h{ width:34px; height:22px; }
+  .shape-v{ width:22px; height:34px; }
+
+  /* ---------- RIGHT: PREVIEW / STAGE ---------- */
+  .preview-wrap{ padding:70px 60px; display:flex; justify-content:center; align-items:flex-start; }
+  .stage{ position:relative; display:inline-block; }
+
+  /* ============ CARD (base = 모던 미니멀 구조) ============ */
+  #card{
+    position:relative; z-index:1;
+    background:var(--bg); color:var(--fg);
+    font-family:var(--font-body);
+    border:1px solid var(--border-c);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    transition:width .2s ease;
+    --pair-ratio: 1/1;
+  }
+  #card[data-theme="modern"]{
+    --bg:#ffffff; --fg:#161616; --sub:#8a8a8a; --accent:#161616; --accent-soft:#f2f2f2; --accent-deep:#161616;
+    --font-head:'Space Grotesk', sans-serif; --font-body:'Space Grotesk', sans-serif;
+    --radius:0px; --shadow:none; --border-c:#1c1c1c;
+  }
+  #card[data-theme="pastel"]{
+    --bg:#fff3ea; --fg:#4a3728; --sub:#9c8570; --accent:#e8794f; --accent-soft:#ffbfd6; --accent-deep:#7a1f42;
+    --font-head:'Jua', sans-serif; --font-body:'Jua', sans-serif;
+    --radius:28px; --shadow:8px 8px 0 #ffcf9e; --border-c:transparent;
+  }
+  #card[data-theme="diary"]{
+    --bg:#f7f2e9; --fg:#4a3f33; --sub:#8a7d68; --accent:#a8763f; --accent-soft:#efe3c8; --accent-deep:#6b4a22;
+    --font-head:'Nanum Myeongjo', serif; --font-body:'Gaegu', sans-serif;
+    --radius:6px; --shadow:0 8px 22px rgba(70,55,35,0.16); --border-c:transparent;
+  }
+  #card[data-theme="dark"]{
+    --bg:#141018; --fg:#f1eaf5; --sub:#a495b3; --accent:#b98cff; --accent-soft:rgba(185,140,255,0.15); --accent-deep:#d4bcff;
+    --font-head:'Do Hyeon', sans-serif; --font-body:'Gowun Dodum', sans-serif;
+    --radius:20px; --shadow:none; --border-c:#322640;
+  }
+
+  #card[data-layout="horizontal"]{ width:900px; }
+  #card[data-layout="vertical"]{ width:400px; }
+
+  .cd-top{ padding:24px 26px 0; }
+  .cd-eyebrow{ font-size:11px; letter-spacing:2px; color:var(--sub); margin-bottom:6px; }
+  #card[data-theme="modern"] .cd-eyebrow{ text-transform:uppercase; }
+  #card[data-theme="pastel"] .cd-eyebrow,
+  #card[data-theme="diary"] .cd-eyebrow,
+  #card[data-theme="dark"] .cd-eyebrow{ display:flex; align-items:center; gap:7px; letter-spacing:0.5px; }
+  #card[data-theme="pastel"] .cd-eyebrow::before,
+  #card[data-theme="diary"] .cd-eyebrow::before,
+  #card[data-theme="dark"] .cd-eyebrow::before{ content:''; width:5px; height:14px; border-radius:3px; background:var(--accent); display:inline-block; }
+
+  .cd-name{ font-family:var(--font-head); font-weight:700; margin:2px 0 2px; letter-spacing:-0.5px; }
+  #card[data-layout="horizontal"] .cd-name{ font-size:34px; }
+  #card[data-layout="vertical"] .cd-name{ font-size:30px; }
+  #card[data-theme="dark"] .cd-name{ text-shadow:0 0 16px var(--accent); }
+
+  .cd-handle{ font-size:12.5px; color:var(--sub); margin-bottom:16px; }
+
+  .cd-photo-outer{ position:relative; padding:0 26px; }
+  #card[data-theme="diary"] .cd-photo-outer{ padding:0 26px; }
+  .cd-photo-frame{ position:relative; background:#e6e6e6; overflow:hidden; }
+  #card[data-layout="horizontal"] .cd-photo-frame{ height:190px; }
+  #card[data-layout="vertical"] .cd-photo-frame{ height:360px; }
+  .cd-photo-frame .ph{
+    width:100%; height:100%; background-size:cover; background-position:center; background-color:#e6e6e6;
+  }
+  #card[data-theme="modern"] .cd-photo-frame{ border-radius:0; }
+  #card[data-theme="pastel"] .cd-photo-frame{ border-radius:20px; }
+  #card[data-theme="diary"] .cd-photo-frame{ border-radius:2px; padding:8px; background:#fff; box-shadow:0 3px 10px rgba(0,0,0,.15); }
+  #card[data-theme="diary"] .cd-photo-frame .ph{ height:calc(100% - 0px); }
+  #card[data-theme="dark"] .cd-photo-frame{ border-radius:14px; }
+
+  .cd-tape{ display:none; position:absolute; top:-10px; left:44px; width:70px; height:22px; background:rgba(255,225,140,0.75); transform:rotate(-6deg); z-index:2; }
+  #card[data-theme="diary"] .cd-tape{ display:block; }
+
+  /* 메인 사진 풀블리드는 모던 미니멀 테마에서만 적용 */
+  #card[data-theme="modern"] .cd-photo-outer{ padding:0; margin-top:16px; }
+  #card[data-theme="modern"] .cd-photo-frame{ border-radius:0; }
+
+  .cd-tags{ padding:0 26px; margin-top:16px; }
+  #card[data-theme="modern"] .cd-tags{ display:flex; border-top:1px solid var(--border-c); padding:0; margin:18px 0 0; }
+  #card[data-theme="pastel"] .cd-tags,
+  #card[data-theme="diary"] .cd-tags,
+  #card[data-theme="dark"] .cd-tags{ display:flex; flex-wrap:wrap; gap:7px; }
+
+  .tag-pill{ background:var(--accent-soft); color:var(--accent-deep); font-size:12.5px; font-weight:700; padding:6px 13px; border-radius:999px; }
+  #card[data-theme="modern"] .tag-pill{ flex:1; text-align:center; background:transparent; color:var(--fg); border-radius:0; padding:9px 4px; font-size:11px; font-weight:400; border-right:1px solid var(--border-c); }
+  #card[data-theme="modern"] .tag-pill:last-child{ border-right:none; }
+  #card[data-theme="dark"] .tag-pill{ border:1px solid #6f4f99; }
+
+  .cd-body{ padding:16px 26px 26px; }
+
+  .cd-box{ background:#fff; border:1.5px solid var(--border-c); border-radius:14px; padding:15px 17px; margin-bottom:14px; font-size:12.5px; line-height:1.7; }
+  #card[data-theme="modern"] .cd-box{ background:transparent; border:none; border-top:1px solid var(--border-c); border-radius:0; padding:14px 0 0; margin-bottom:16px; }
+  #card[data-theme="pastel"] .cd-box{ background:#fff; border:3px solid var(--accent-soft); border-radius:18px; }
+  #card[data-theme="diary"] .cd-box{ background:transparent; border:none; border-top:1px dashed var(--border-c); border-radius:0; padding:14px 0 0; }
+  #card[data-theme="dark"] .cd-box{ background:#1d1726; border:1px solid #322640; }
+
+  .cd-box b{ display:block; font-size:10.5px; letter-spacing:1px; color:var(--sub); margin-bottom:6px; }
+  #card[data-theme="pastel"] .cd-box b,
+  #card[data-theme="diary"] .cd-box b,
+  #card[data-theme="dark"] .cd-box b{ color:var(--accent); font-size:11.5px; letter-spacing:0; }
+  .cd-box ul{ margin:0; padding-left:16px; }
+  .cd-box li{ margin-bottom:4px; }
+  .cd-box li::marker{ color:var(--accent); }
+
+  .cd-pairtitle{ font-family:var(--font-head); font-size:14px; letter-spacing:1px; margin:6px 0 12px; display:flex; align-items:center; gap:8px; }
+  #card[data-theme="modern"] .cd-pairtitle{ padding-top:14px; border-top:1px solid var(--border-c); text-transform:uppercase; font-size:11px; letter-spacing:2px; color:var(--sub); }
+  #card[data-theme="pastel"] .cd-pairtitle::before,
+  #card[data-theme="diary"] .cd-pairtitle::before,
+  #card[data-theme="dark"] .cd-pairtitle::before{ content:''; width:5px; height:15px; border-radius:3px; background:var(--accent); display:inline-block; }
+
+  .cd-pairgrid{ display:grid; gap:12px; align-items:start; }
+  #card[data-layout="horizontal"] .cd-pairgrid{ grid-template-columns:repeat(4,1fr); }
+  #card[data-layout="vertical"] .cd-pairgrid{ grid-template-columns:repeat(2,1fr); }
+
+  /* 페어 카드: 비율(3:4 또는 1:1)은 사용자가 고르고, 그 비율 안에서 object-fit:cover로
+     "잘라서" 채운다 — cover는 절대 이미지를 늘리거나 눌리게 하지 않고 잘라내기만 한다. */
+  .pcard{ position:relative; border-radius:12px; overflow:hidden; background:#e8e2ea; aspect-ratio:var(--pair-ratio, 1/1); display:flex; align-items:center; justify-content:center; }
+  #card[data-theme="modern"] .pcard{ border-radius:0; border:1px solid var(--border-c); }
+  .pcard .pempty-label{ font-size:11px; color:var(--sub); }
+  .pcard img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .pcard .pgrad{ position:absolute; left:0; right:0; bottom:0; height:55%; background:linear-gradient(to top, rgba(15,10,15,0.72) 0%, rgba(15,10,15,0.05) 70%, transparent 100%); }
+  .pcard .pinfo{ position:absolute; left:9px; right:9px; bottom:8px; color:#fff; }
+  .pcard .pname{ font-size:12.5px; font-weight:700; text-shadow:0 1px 4px rgba(0,0,0,.4); }
+  .pcard .ptag{ font-size:10px; opacity:.88; margin-top:1px; text-shadow:0 1px 4px rgba(0,0,0,.4); }
+
+  /* ---- STICKERS (비율 항상 유지: width만 지정, height auto) ---- */
+  .sticker{ position:absolute; top:0; left:0; cursor:grab; user-select:none; touch-action:none; z-index:40; }
+  .sticker:active{ cursor:grabbing; }
+  .sticker img{ display:block; width:100%; height:auto; pointer-events:none; -webkit-user-drag:none; filter:drop-shadow(0 10px 18px rgba(40,20,35,0.18)); }
+  .sticker.selected::after{ content:''; position:absolute; inset:-6px; border:2px dashed var(--ui-accent); border-radius:10px; pointer-events:none; }
+  .sticker .stk-del{ position:absolute; top:-11px; right:-11px; width:24px; height:24px; border-radius:50%; background:var(--ui-accent); color:#fff; border:2px solid #fff; font-size:12px; line-height:1; display:none; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.2); }
+  .sticker.selected .stk-del{ display:flex; }
+  .sticker .stk-resize{ position:absolute; right:-8px; bottom:-8px; width:18px; height:18px; border-radius:50%; background:#fff; border:2px solid var(--ui-accent); display:none; cursor:nwse-resize; box-shadow:0 2px 6px rgba(0,0,0,.18); }
+  .sticker.selected .stk-resize{ display:block; }
+  .stage.exporting .sticker.selected::after, .stage.exporting .stk-del, .stage.exporting .stk-resize{ display:none !important; }
+
+  @media (max-width: 980px){
+    .app{ grid-template-columns:1fr; }
+    .editor{ max-height:none; border-right:none; border-bottom:1px solid var(--ui-line); }
+    .preview-wrap{ padding:40px 16px; }
+    #card[data-layout="horizontal"]{ width:100%; max-width:900px; }
+    #card[data-layout="vertical"]{ width:100%; max-width:400px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ EDITOR ============ -->
+  <div class="editor">
+    <h1>자기소개 카드 에디터</h1>
+    <p class="lead">왼쪽에서 내용을 입력하면 오른쪽 미리보기가 실시간으로 바뀌어요. 테마도 자유롭게 바꿔보세요.</p>
+
+    <!-- 테마 -->
+    <div class="section">
+      <div class="section-title"><span class="bar"></span>테마</div>
+      <div class="theme-grid" id="themeGrid"></div>
+    </div>
+
+    <!-- 색상 커스터마이즈 -->
+    <div class="section">
+      <div class="section-title"><span class="bar"></span>색상 커스터마이즈</div>
+      <div class="section-hint">테마 색을 그대로 써도 되고, 직접 바꿔도 돼요.</div>
+      <div class="row2">
+        <div>
+          <label class="field">배경색</label>
+          <input type="color" class="colorpick" id="bgColorInput" oninput="setColorOverride('bg', this.value)">
+        </div>
+        <div>
+          <label class="field">텍스트색</label>
+          <input type="color" class="colorpick" id="fgColorInput" oninput="setColorOverride('fg', this.value)">
+        </div>
+      </div>
+      <label class="field">포인트 컬러</label>
+      <input type="color" class="colorpick" id="accentColorInput" oninput="setColorOverride('accent', this.value)">
+      <button class="btn ghost small block" onclick="resetColorOverrides()">테마 기본색으로 되돌리기</button>
+    </div>
+
+    <!-- 사진 -->
+    <div class="section">
+      <div class="section-title"><span class="bar"></span>메인 사진</div>
+      <label class="filebtn">
+        <img id="photoThumb" class="thumb" style="display:none;">
+        <span id="photoLabel">이미지 선택</span>
+        <input type="file" accept="image/*" onchange="handlePhoto(this)">
+      </label>
+    </div>
+
+    <!-- 일러스트 스티커 -->
+    <div class="section">
+      <div class="section-title"><span class="bar"></span>일러스트 스티커</div>
+      <div class="section-hint">메인/서브 일러스트는 전부 스티커예요. 원하는 만큼 추가하고, 카드 위에서 자유롭게 드래그로 옮기고 크기/각도를 조절하세요. 비율은 항상 그대로 유지돼서 절대 안 눌려요.</div>
+      <label class="filebtn">
+        <span>🖼 일러스트 추가하기 (여러 장 가능)</span>
+        <input type="file" accept="image/*" multiple onchange="handleAddStickers(this)">
+      </label>
+      <div id="stickerEditList" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- MAIN 정보 -->
+    <div class="section">
+      <div class="section-title"><span class="bar"></span>프로필 정보</div>
+      <div class="row2">
+        <div>
+          <label class="field">이름</label>
+          <input type="text" id="nameInput" value="이름" oninput="render()">
+        </div>
+        <div>
+          <label class="field">계정 핸들</label>
+          <input type="text" id="handleInput" value="@handle" oninput="render()">
+        </div>
+      </div>
+      <label class="field">해시태그</label>
+      <div class="chiplist" id="tagChips"></div>
+      <div class="addrow">
+        <input type="text" id="tagInput" placeholder="예: #HL" onkeydown="if(event.key==='Enter'){addTag();event.preventDefault();}">
+        <button class="btn small" onclick="addTag()">추가</button>
+      </div>
+
+      <label class="field">폰트</label>
+      <select id="fontFamily" onchange="setFontOverride(this.value)">
+        <option value="'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">기본체</option>
+        <option value="'Courier New', 'D2Coding', monospace">타자기체</option>
+        <option value="'Yidstreet', 'Apple SD Gothic Neo', sans-serif">Y이드스트릿체</option>
+        <option value="'Eulyoo1945', serif">을유1945</option>
+        <option value="'PyeojinGothic', 'Apple SD Gothic Neo', sans-serif">펴진고딕</option>
+        <option value="'HsGlidingSerif', 'AppleMyungjo', serif">HS활공명조</option>
+        <option value="'KerisKedyuche', 'Apple SD Gothic Neo', sans-serif">케리스 케듀체</option>
+        <option value="'ChosunIlboMyungjo', 'AppleMyungjo', serif">조선일보명조체</option>
+        <option value="'Mona12', 'Mona', 'Courier New', monospace">Mona12</option>
+        <option value="'MunmakchoHaeban', 'Apple SD Gothic Neo', sans-serif">문막초 해반체</option>
+      </select>
+    </div>
+
+    <!-- 안내사항 -->
+    <div class="section">
+      <div class="section-title"><span class="bar"></span>안내사항</div>
+      <div id="noticeList"></div>
+      <button class="btn ghost small block" onclick="addListItem('notices')">+ 문장 추가</button>
+    </div>
+
+    <!-- 주의사항 -->
+    <div class="section">
+      <div class="section-title"><span class="bar"></span>주의사항</div>
+      <div id="cautionList"></div>
+      <button class="btn ghost small block" onclick="addListItem('cautions')">+ 문장 추가</button>
+    </div>
+
+    <!-- PAIR -->
+    <div class="section">
+      <div class="section-title"><span class="bar"></span>PAIR</div>
+      <label class="field">이미지 비율</label>
+      <div class="layout-grid" id="pairRatioGrid"></div>
+      <div id="pairList"></div>
+      <button class="btn ghost small block" onclick="addPair()">+ 페어 카드 추가</button>
+    </div>
+
+    <div class="export-bar">
+      <button class="btn block" onclick="exportPNG()">🖼 이미지로 저장 (PNG)</button>
+    </div>
+  </div>
+
+  <!-- ============ PREVIEW / STAGE ============ -->
+  <div class="preview-wrap">
+    <div class="stage" id="stage">
+      <div id="card" data-theme="modern" data-layout="horizontal">
+        <div class="cd-top">
+          <div class="cd-eyebrow">MAIN</div>
+          <div class="cd-name" id="pvName">이름</div>
+          <div class="cd-handle" id="pvHandle">(@handle)</div>
+        </div>
+        <div class="cd-photo-outer">
+          <div class="cd-tape"></div>
+          <div class="cd-photo-frame"><div class="ph" id="photoBg"></div></div>
+        </div>
+        <div class="cd-tags" id="pvTags"></div>
+        <div class="cd-body">
+          <div class="cd-box" id="noticeBox">
+            <b>안내사항</b>
+            <ul id="pvNotices"></ul>
+          </div>
+          <div class="cd-box" id="cautionBox">
+            <b>주의사항</b>
+            <ul id="pvCautions"></ul>
+          </div>
+          <div class="cd-pairtitle">PAIR</div>
+          <div class="cd-pairgrid" id="pvPairs"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---------------- STATE ----------------
+const state = {
+  theme: 'modern',
+  layout: 'horizontal',
+  pairRatio: '1/1',
+  colorOverride: { bg:null, fg:null, accent:null },
+  fontOverride: null,
+  photo: null,
+  tags: ["#HL", "#ALL", "#CBC", "#OPEN"],
+  notices: [
+    "요즘엔 조금 느리게 흘러가는 거 같아요… 그러니 언제나 편하게 블블 부탁드려요.",
+    "언제나 사랑해요~!!"
+  ],
+  cautions: [
+    "언제나 늘 그렇듯 찍먹하고 폭먹합니다.",
+    "아래 페어 이외에도 다수 붐업하고 사랑하는 중입니다. 자세한 페어들은 블로그로!"
+  ],
+  pairs: [
+    { image: null, name: "레이지수림", tag: "#바보설표와바보주인" },
+    { image: null, name: "단테영우",   tag: "#너를위해달리는이유" },
+    { image: null, name: "승한연주",   tag: "#베이스줄보다섬세하게" },
+    { image: null, name: "산리온",     tag: "#태양을삼킨새벽" }
+  ],
+  stickers: [],
+  selectedStickerId: null
+};
+
+const THEMES = [
+  { id:'modern', name:'모던 미니멀', cls:'sw-modern' },
+  { id:'pastel', name:'파스텔 팝',   cls:'sw-pastel' },
+  { id:'diary',  name:'감성 다이어리', cls:'sw-diary' },
+  { id:'dark',   name:'다크 무드',   cls:'sw-dark' }
+];
+
+function renderThemeGrid(){
+  const wrap = document.getElementById('themeGrid');
+  wrap.innerHTML = THEMES.map(t => `
+    <div class="theme-swatch ${state.theme===t.id?'active':''}" onclick="setTheme('${t.id}')">
+      <div class="sw-bar ${t.cls}"></div>
+      <div class="sw-name">${t.name}</div>
+    </div>
+  `).join('');
+}
+function setTheme(id){
+  state.theme = id;
+  document.getElementById('card').setAttribute('data-theme', id);
+  resetColorOverrides();
+  resetFontOverride();
+  renderThemeGrid();
+}
+function setFontOverride(v){
+  state.fontOverride = v;
+  const card = document.getElementById('card');
+  card.style.setProperty('--font-head', v);
+  card.style.setProperty('--font-body', v);
+}
+function resetFontOverride(){
+  state.fontOverride = null;
+  const card = document.getElementById('card');
+  card.style.removeProperty('--font-head');
+  card.style.removeProperty('--font-body');
+  const sel = document.getElementById('fontFamily');
+  if(sel) sel.selectedIndex = 0;
+}
+
+// ---------------- COLOR OVERRIDE ----------------
+function hexToRgb(hex){
+  hex = hex.replace('#','').trim();
+  if(hex.length===3) hex = hex.split('').map(c=>c+c).join('');
+  const num = parseInt(hex,16);
+  return [(num>>16)&255, (num>>8)&255, num&255];
+}
+function rgbToHex(r,g,b){
+  return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+}
+function shade(hex, percent){
+  const [r,g,b] = hexToRgb(hex);
+  let nr,ng,nb;
+  if(percent >= 0){
+    nr = r+(255-r)*(percent/100); ng = g+(255-g)*(percent/100); nb = b+(255-b)*(percent/100);
+  } else {
+    const p = 1+percent/100;
+    nr = r*p; ng = g*p; nb = b*p;
+  }
+  return rgbToHex(nr,ng,nb);
+}
+function currentThemeColor(varName, fallback){
+  const v = getComputedStyle(document.getElementById('card')).getPropertyValue(varName).trim();
+  return v || fallback;
+}
+function setColorOverride(key, value){
+  state.colorOverride[key] = value;
+  applyColorOverrides();
+}
+function applyColorOverrides(){
+  const card = document.getElementById('card');
+  const { bg, fg, accent } = state.colorOverride;
+  bg ? card.style.setProperty('--bg', bg) : card.style.removeProperty('--bg');
+  fg ? card.style.setProperty('--fg', fg) : card.style.removeProperty('--fg');
+  if(accent){
+    card.style.setProperty('--accent', accent);
+    card.style.setProperty('--accent-deep', shade(accent, -25));
+    card.style.setProperty('--accent-soft', shade(accent, 65));
+  } else {
+    card.style.removeProperty('--accent');
+    card.style.removeProperty('--accent-deep');
+    card.style.removeProperty('--accent-soft');
+  }
+}
+function resetColorOverrides(){
+  state.colorOverride = { bg:null, fg:null, accent:null };
+  applyColorOverrides();
+  document.getElementById('bgColorInput').value = currentThemeColor('--bg', '#ffffff');
+  document.getElementById('fgColorInput').value = currentThemeColor('--fg', '#161616');
+  document.getElementById('accentColorInput').value = currentThemeColor('--accent', '#ef5f83');
+}
+
+function renderPairRatioGrid(){
+  const wrap = document.getElementById('pairRatioGrid');
+  wrap.innerHTML = `
+    <div class="layout-btn ${state.pairRatio==='4/3'?'active':''}" onclick="setPairRatio('4/3')">4 : 3</div>
+    <div class="layout-btn ${state.pairRatio==='1/1'?'active':''}" onclick="setPairRatio('1/1')">1 : 1</div>
+  `;
+}
+function setPairRatio(r){
+  state.pairRatio = r;
+  document.getElementById('card').style.setProperty('--pair-ratio', r);
+  updatePairGridColumns();
+  renderPairRatioGrid();
+}
+function updatePairGridColumns(){
+  const grid = document.getElementById('pvPairs');
+  if(grid) grid.style.gridTemplateColumns = state.pairRatio === '4/3' ? 'repeat(2,1fr)' : 'repeat(4,1fr)';
+}
+
+// ---------------- PHOTO ----------------
+function handlePhoto(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.photo = e.target.result;
+    const thumb = document.getElementById('photoThumb');
+    const label = document.getElementById('photoLabel');
+    thumb.src = state.photo;
+    thumb.style.display = 'block';
+    label.textContent = file.name;
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ---------------- PAIR IMAGE ----------------
+function handlePairImage(input, idx){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.pairs[idx].image = e.target.result;
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ---------------- TAGS ----------------
+function addTag(){
+  const inp = document.getElementById('tagInput');
+  let v = inp.value.trim();
+  if(!v) return;
+  if(!v.startsWith('#')) v = '#'+v;
+  state.tags.push(v);
+  inp.value = '';
+  render();
+}
+function removeTag(i){ state.tags.splice(i,1); render(); }
+
+// ---------------- LIST ITEMS ----------------
+function addListItem(key){ state[key].push(""); render(); }
+function removeListItem(key, i){ state[key].splice(i,1); render(); }
+function updateRTE(key, i, html){ state[key][i] = html; syncPreviewList(key); }
+
+function buildListEditor(key){
+  return state[key].map((html,i)=>{
+    const id = `rte-${key}-${i}`;
+    return `
+    <div class="listitem">
+      <div class="rte-wrap">
+        <div class="rte-toolbar">
+          <button type="button" title="굵게" onmousedown="event.preventDefault()" onclick="applyInlineFmt('${key}',${i},'bold')"><b>B</b></button>
+          <button type="button" title="취소선" onmousedown="event.preventDefault()" onclick="applyInlineFmt('${key}',${i},'strikeThrough')"><s>S</s></button>
+          <button type="button" title="밑줄" onmousedown="event.preventDefault()" onclick="applyInlineFmt('${key}',${i},'underline')"><u>U</u></button>
+          <input type="color" class="rte-color" title="글자색" value="#c73f66" onmousedown="saveSelection('${id}')" oninput="applyColorFmt('${key}',${i},'fore',this.value)">
+          <input type="color" class="rte-color" title="하이라이트" value="#fff3b0" onmousedown="saveSelection('${id}')" oninput="applyColorFmt('${key}',${i},'hilite',this.value)">
+        </div>
+        <div class="rte" id="${id}" contenteditable="true" data-placeholder="문장을 입력하세요"
+          oninput="updateRTE('${key}',${i},this.innerHTML)">${html}</div>
+      </div>
+      <button class="iconbtn" onclick="removeListItem('${key}',${i})">✕</button>
+    </div>`;
+  }).join('') || '<div class="empty-note">문장을 추가해보세요</div>';
+}
+
+// ---- 서식 적용 (선택 영역 저장/복원 후 execCommand) ----
+const savedRanges = {};
+function saveSelection(id){
+  const sel = window.getSelection();
+  if(sel && sel.rangeCount > 0){
+    const range = sel.getRangeAt(0);
+    const el = document.getElementById(id);
+    if(el && el.contains(range.commonAncestorContainer)){
+      savedRanges[id] = range.cloneRange();
+    }
+  }
+}
+function restoreSelection(id){
+  const range = savedRanges[id];
+  if(!range) return;
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+function applyInlineFmt(key, i, cmd){
+  const id = `rte-${key}-${i}`;
+  const el = document.getElementById(id);
+  el.focus();
+  document.execCommand(cmd, false, null);
+  state[key][i] = el.innerHTML;
+}
+function applyColorFmt(key, i, kind, value){
+  const id = `rte-${key}-${i}`;
+  const el = document.getElementById(id);
+  restoreSelection(id);
+  el.focus();
+  if(kind === 'fore'){
+    document.execCommand('foreColor', false, value);
+  } else {
+    const ok = document.execCommand('hiliteColor', false, value);
+    if(!ok) document.execCommand('backColor', false, value);
+  }
+  state[key][i] = el.innerHTML;
+}
+
+// ---------------- PAIRS ----------------
+function addPair(){ state.pairs.push({ image:null, name:"이름", tag:"#해시태그" }); render(); }
+function removePair(i){ state.pairs.splice(i,1); render(); }
+function updatePairField(i, field, val){ state.pairs[i][field] = val; }
+
+// ---------------- STICKERS ----------------
+function uid(){ return 'stk_' + Math.random().toString(36).slice(2, 10); }
+
+function handleAddStickers(input){
+  const files = Array.from(input.files || []);
+  if(!files.length) return;
+  files.forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const maxZ = state.stickers.reduce((m,s)=>Math.max(m,s.z||0), 40);
+        const ratio = img.naturalHeight / img.naturalWidth;
+        const baseWidth = ratio > 1.3 ? 190 : 260;
+        const sticker = {
+          id: uid(), src: e.target.result,
+          x: 460 + (state.stickers.length % 4) * 14,
+          y: 30 + (state.stickers.length % 4) * 22,
+          width: baseWidth, rotate: 0, z: maxZ + 1
+        };
+        state.stickers.push(sticker);
+        state.selectedStickerId = sticker.id;
+        render();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function selectSticker(id){
+  state.selectedStickerId = (state.selectedStickerId === id) ? null : id;
+  render();
+}
+function removeSticker(id){
+  state.stickers = state.stickers.filter(s => s.id !== id);
+  if(state.selectedStickerId === id) state.selectedStickerId = null;
+  render();
+}
+function bringFront(id){
+  const maxZ = state.stickers.reduce((m,s)=>Math.max(m,s.z||0), 40);
+  const s = state.stickers.find(s=>s.id===id);
+  if(s) s.z = maxZ + 1;
+  render();
+}
+function sendBack(id){
+  const minZ = state.stickers.reduce((m,s)=>Math.min(m,s.z||0), 40);
+  const s = state.stickers.find(s=>s.id===id);
+  if(s) s.z = minZ - 1;
+  render();
+}
+function updateStickerWidth(id, val){
+  const s = state.stickers.find(s=>s.id===id);
+  if(!s) return;
+  s.width = Number(val);
+  const node = document.querySelector(`.sticker[data-id="${id}"]`);
+  if(node) node.style.width = s.width + 'px';
+}
+function updateStickerRotate(id, val){
+  const s = state.stickers.find(s=>s.id===id);
+  if(!s) return;
+  s.rotate = Number(val);
+  const node = document.querySelector(`.sticker[data-id="${id}"]`);
+  if(node) node.style.transform = `rotate(${s.rotate}deg)`;
+}
+
+// ---------------- RENDER: EDITOR LISTS ----------------
+function renderEditorLists(){
+  const tagChips = document.getElementById('tagChips');
+  tagChips.innerHTML = state.tags.map((t,i)=>
+    `<span class="chip">${escapeHtml(t)}<button onclick="removeTag(${i})">✕</button></span>`
+  ).join('');
+
+  document.getElementById('noticeList').innerHTML = buildListEditor('notices');
+  document.getElementById('cautionList').innerHTML = buildListEditor('cautions');
+
+  const pairList = document.getElementById('pairList');
+  pairList.innerHTML = state.pairs.map((p,i)=>`
+    <div class="pair-card-edit">
+      <button class="iconbtn removepair" onclick="removePair(${i})">✕</button>
+      <label class="filebtn">
+        <img class="thumb" src="${p.image || ''}" style="${p.image?'':'display:none;'}">
+        <span>${p.image ? '이미지 변경' : '이미지 선택'}</span>
+        <input type="file" accept="image/*" onchange="handlePairImage(this, ${i})">
+      </label>
+      <div class="pair-grid-fields">
+        <input type="text" placeholder="페어명" value="${escapeAttr(p.name)}"
+          oninput="updatePairField(${i},'name',this.value); syncPreviewPairs()">
+        <input type="text" placeholder="#해시태그" value="${escapeAttr(p.tag)}"
+          oninput="updatePairField(${i},'tag',this.value); syncPreviewPairs()">
+      </div>
+    </div>
+  `).join('') || '<div class="empty-note">페어 카드를 추가해보세요</div>';
+
+  const stickerList = document.getElementById('stickerEditList');
+  stickerList.innerHTML = state.stickers.map((s,i)=>`
+    <div class="sticker-edit-card ${state.selectedStickerId===s.id?'is-selected':''}">
+      <div class="sticker-edit-top">
+        <img src="${s.src}" data-stk-thumb="${s.id}" onclick="selectSticker('${s.id}')">
+        <span class="lbl" onclick="selectSticker('${s.id}')">일러스트 ${i+1}</span>
+        <div class="sticker-edit-actions">
+          <button title="뒤로" onclick="sendBack('${s.id}')">⬇</button>
+          <button title="앞으로" onclick="bringFront('${s.id}')">⬆</button>
+          <button title="삭제" onclick="removeSticker('${s.id}')">✕</button>
+        </div>
+      </div>
+      <div class="sticker-edit-row">
+        <label>크기</label>
+        <input type="range" min="60" max="500" value="${s.width}" oninput="updateStickerWidth('${s.id}', this.value)">
+      </div>
+      <div class="sticker-edit-row">
+        <label>각도</label>
+        <input type="range" min="-180" max="180" value="${s.rotate}" oninput="updateStickerRotate('${s.id}', this.value)">
+      </div>
+    </div>
+  `).join('') || '<div class="empty-note">아직 추가된 일러스트가 없어요</div>';
+}
+
+function syncPreviewList(key){
+  const ul = document.getElementById(key === 'notices' ? 'pvNotices' : 'pvCautions');
+  const items = state[key].filter(n => n && n.trim() !== '' && n !== '<br>');
+  ul.innerHTML = items.map(n=>`<li>${n}</li>`).join('') || '<li style="list-style:none;color:#bbb;">내용을 입력해주세요</li>';
+}
+function syncPreviewPairs(){ renderPairsPreview(); }
+
+function escapeHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+
+function renderPhoto(){
+  const el = document.getElementById('photoBg');
+  if(state.photo){
+    el.style.background = `url(${state.photo}) center/cover no-repeat`;
+  } else {
+    el.style.background = '#e6e6e6';
+  }
+}
+
+function renderHead(){
+  document.getElementById('pvName').textContent = document.getElementById('nameInput').value || '이름';
+  document.getElementById('pvHandle').textContent = '(' + (document.getElementById('handleInput').value || '@handle') + ')';
+  document.getElementById('pvTags').innerHTML = state.tags.map(t=>
+    `<span class="tag-pill">${escapeHtml(t)}</span>`
+  ).join('');
+}
+
+function renderInfoBoxes(){
+  syncPreviewList('notices');
+  syncPreviewList('cautions');
+}
+
+function renderPairsPreview(){
+  const grid = document.getElementById('pvPairs');
+  grid.innerHTML = state.pairs.map(p => `
+    <div class="pcard">
+      ${p.image
+        ? `<img src="${p.image}">`
+        : `<span class="pempty-label">이미지 없음</span>`}
+      <div class="pgrad"></div>
+      <div class="pinfo">
+        <div class="pname">${escapeHtml(p.name)}</div>
+        <div class="ptag">${escapeHtml(p.tag)}</div>
+      </div>
+    </div>
+  `).join('') || '<div class="empty-note" style="grid-column:1/-1;">페어 카드를 추가해보세요</div>';
+  updatePairGridColumns();
+}
+
+function renderStickers(){
+  const stage = document.getElementById('stage');
+  stage.querySelectorAll('.sticker').forEach(n=>n.remove());
+  state.stickers.forEach(s=>{
+    const node = document.createElement('div');
+    node.className = 'sticker' + (state.selectedStickerId === s.id ? ' selected' : '');
+    node.dataset.id = s.id;
+    node.style.left = s.x + 'px';
+    node.style.top = s.y + 'px';
+    node.style.width = s.width + 'px';
+    node.style.transform = `rotate(${s.rotate}deg)`;
+    node.style.zIndex = s.z || 40;
+    node.innerHTML = `
+      <img src="${s.src}" draggable="false">
+      <div class="stk-del" onclick="event.stopPropagation(); removeSticker('${s.id}')">✕</div>
+      <div class="stk-resize"></div>
+    `;
+    stage.appendChild(node);
+    makeStickerInteractive(node, s);
+  });
+}
+
+function makeStickerInteractive(node, sticker){
+  const stage = document.getElementById('stage');
+  let dragging = false, startX=0, startY=0, baseX=0, baseY=0;
+  node.addEventListener('pointerdown', e=>{
+    if(e.target.closest('.stk-resize')) return;
+    dragging = true;
+    state.selectedStickerId = sticker.id;
+    node.classList.add('selected');
+    startX = e.clientX; startY = e.clientY;
+    baseX = sticker.x; baseY = sticker.y;
+    node.setPointerCapture(e.pointerId);
+    renderEditorLists();
+  });
+  node.addEventListener('pointermove', e=>{
+    if(!dragging) return;
+    const rect = stage.getBoundingClientRect();
+    const scale = rect.width / stage.offsetWidth;
+    sticker.x = baseX + (e.clientX - startX) / scale;
+    sticker.y = baseY + (e.clientY - startY) / scale;
+    node.style.left = sticker.x + 'px';
+    node.style.top = sticker.y + 'px';
+  });
+  node.addEventListener('pointerup', ()=>{ dragging = false; });
+
+  node.addEventListener('wheel', e=>{
+    if(!e.shiftKey) return;
+    e.preventDefault();
+    state.selectedStickerId = sticker.id;
+    sticker.rotate = Math.max(-180, Math.min(180, sticker.rotate + (e.deltaY>0?3:-3)));
+    node.style.transform = `rotate(${sticker.rotate}deg)`;
+    renderEditorLists();
+  }, {passive:false});
+
+  const handle = node.querySelector('.stk-resize');
+  let resizing = false, rStartX=0, baseW=0;
+  handle.addEventListener('pointerdown', e=>{
+    e.stopPropagation();
+    resizing = true;
+    state.selectedStickerId = sticker.id;
+    rStartX = e.clientX;
+    baseW = sticker.width;
+    handle.setPointerCapture(e.pointerId);
+    renderEditorLists();
+  });
+  handle.addEventListener('pointermove', e=>{
+    if(!resizing) return;
+    const rect = stage.getBoundingClientRect();
+    const scale = rect.width / stage.offsetWidth;
+    const newW = Math.max(60, Math.min(600, baseW + (e.clientX - rStartX)/scale));
+    sticker.width = newW;
+    node.style.width = newW + 'px';
+    const slider = document.querySelector(`.sticker-edit-card.is-selected input[type=range]`);
+    if(slider) slider.value = Math.round(newW);
+  });
+  handle.addEventListener('pointerup', e=>{ e.stopPropagation(); resizing = false; });
+
+  node.addEventListener('click', e=> e.stopPropagation());
+}
+
+document.getElementById('stage').addEventListener('click', ()=>{
+  state.selectedStickerId = null;
+  render();
+});
+
+function render(){
+  renderThemeGrid();
+  renderPairRatioGrid();
+  renderEditorLists();
+  renderPhoto();
+  renderHead();
+  renderInfoBoxes();
+  renderPairsPreview();
+  renderStickers();
+}
+
+// ---------------- EXPORT ----------------
+function exportPNG(){
+  const stage = document.getElementById('stage');
+  state.selectedStickerId = null;
+  render();
+  stage.classList.add('exporting');
+  html2canvas(stage, {scale: 2, useCORS:true, backgroundColor:null}).then(canvas=>{
+    stage.classList.remove('exporting');
+    const link = document.createElement('a');
+    link.download = 'profile-card.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }).catch(()=>{ stage.classList.remove('exporting'); });
+}
+
+render();
+resetColorOverrides();
+</script>
+</body>
+</html>
