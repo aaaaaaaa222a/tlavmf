@@ -174,6 +174,10 @@
   .sw-pastel{ background:linear-gradient(135deg,#ffd9e6,#ffe6ac,#c9ecff); }
   .sw-diary{ background:#f7f2e9; border:1px solid #c9bda3; }
   .sw-dark{ background:linear-gradient(135deg,#4b2e6b,#141018 70%); }
+  .sw-neon{ background:linear-gradient(135deg,#00e5ff,#0d0716 55%,#ff3fb4); }
+  .sw-lovely{ background:linear-gradient(135deg,#ffd4e2,#fff5f8 55%,#ff6f9c); }
+  .sw-vintage{ background:linear-gradient(135deg,#e3cda0,#efe3cf 55%,#a85a28); }
+  .sw-mono{ background:linear-gradient(135deg,#ffffff 50%,#131313 50%); border:1px solid #131313; }
 
   .layout-grid{ display:flex; gap:8px; }
   .layout-btn{
@@ -243,6 +247,26 @@
     --font-head:'Do Hyeon', sans-serif; --font-body:'Gowun Dodum', sans-serif;
     --radius:20px; --shadow:none; --border-c:#322640;
   }
+  #card[data-theme="neon"]{
+    --bg:#0d0716; --fg:#f3eaff; --sub:#9c8cc9; --accent:#00e5ff; --accent-soft:rgba(0,229,255,0.16); --accent-deep:#ff3fb4;
+    --font-head:'Do Hyeon', sans-serif; --font-body:'Space Grotesk', sans-serif;
+    --radius:16px; --shadow:0 0 30px rgba(0,229,255,0.22); --border-c:#2a1f45;
+  }
+  #card[data-theme="lovely"]{
+    --bg:#fff5f8; --fg:#5b3040; --sub:#b98a9d; --accent:#ff6f9c; --accent-soft:#ffe0ea; --accent-deep:#d13868;
+    --font-head:'Jua', sans-serif; --font-body:'Gowun Dodum', sans-serif;
+    --radius:26px; --shadow:6px 6px 0 #ffd4e2; --border-c:transparent;
+  }
+  #card[data-theme="vintage"]{
+    --bg:#efe3cf; --fg:#43331f; --sub:#93805e; --accent:#a85a28; --accent-soft:#e3cda0; --accent-deep:#6b3c13;
+    --font-head:'ChosunIlboMyungjo', serif; --font-body:'Gowun Dodum', sans-serif;
+    --radius:2px; --shadow:0 8px 18px rgba(60,40,10,.28); --border-c:#c9a96e;
+  }
+  #card[data-theme="mono"]{
+    --bg:#ffffff; --fg:#131313; --sub:#767676; --accent:#131313; --accent-soft:#ededed; --accent-deep:#000000;
+    --font-head:'HsGlidingSerif', serif; --font-body:'Gowun Dodum', sans-serif;
+    --radius:0px; --shadow:none; --border-c:#131313;
+  }
 
   #card[data-layout="horizontal"]{ width:900px; }
   #card[data-layout="vertical"]{ width:460px; }
@@ -280,15 +304,58 @@
   .editor[data-theme="dark"] input[type=text], .editor[data-theme="dark"] textarea,
   .editor[data-theme="dark"] select, .editor[data-theme="dark"] .rte{ color:var(--ui-ink); }
 
+  .editor[data-theme="neon"]{
+    --ui-ink:#f3eaff; --ui-sub:#9c8cc9; --ui-panel:#0d0716; --ui-line:#2a1f45;
+    --ui-accent:#00e5ff; --ui-accent-soft:rgba(0,229,255,0.18); --ui-accent-deep:#ff3fb4;
+    --ui-field-bg:#150c22; --ui-field-bg2:#1d1230; --ui-radius:14px;
+    --ui-font:'Space Grotesk', sans-serif; --ui-font-head:'Do Hyeon', sans-serif;
+    --ui-panel-t: rgba(13,7,22,.90);
+  }
+  .editor[data-theme="neon"] .btn:not(.ghost){ color:#0d0716; }
+  .editor[data-theme="neon"] input[type=text], .editor[data-theme="neon"] textarea,
+  .editor[data-theme="neon"] select, .editor[data-theme="neon"] .rte{ color:var(--ui-ink); }
+
+  .editor[data-theme="lovely"]{
+    --ui-ink:#5b3040; --ui-sub:#c398aa; --ui-panel:#fff5f8; --ui-line:#ffd4e2;
+    --ui-accent:#ff6f9c; --ui-accent-soft:#ffe0ea; --ui-accent-deep:#d13868;
+    --ui-field-bg:#fffbfc; --ui-field-bg2:#ffe9f0; --ui-radius:20px;
+    --ui-font:'Jua', 'Gowun Dodum', sans-serif; --ui-font-head:'Jua', sans-serif;
+    --ui-panel-t: rgba(255,245,248,.90);
+  }
+
+  .editor[data-theme="vintage"]{
+    --ui-ink:#43331f; --ui-sub:#93805e; --ui-panel:#faf3e5; --ui-line:#dcc697;
+    --ui-accent:#a85a28; --ui-accent-soft:#e3cda0; --ui-accent-deep:#6b3c13;
+    --ui-field-bg:#fffcf5; --ui-field-bg2:#f3e5c6; --ui-radius:4px;
+    --ui-font:'Gowun Dodum', serif; --ui-font-head:'ChosunIlboMyungjo', serif;
+    --ui-panel-t: rgba(250,243,229,.90);
+  }
+
+  .editor[data-theme="mono"]{
+    --ui-ink:#131313; --ui-sub:#767676; --ui-panel:#ffffff; --ui-line:#dcdcdc;
+    --ui-accent:#131313; --ui-accent-soft:#ededed; --ui-accent-deep:#000000;
+    --ui-field-bg:#fafafa; --ui-field-bg2:#eeeeee; --ui-radius:2px;
+    --ui-font:'Gowun Dodum', sans-serif; --ui-font-head:'HsGlidingSerif', serif;
+    --ui-panel-t: rgba(255,255,255,.90);
+  }
+
   .cd-top{ padding:24px 26px 0; }
   .cd-eyebrow{ font-size:11px; letter-spacing:2px; color:var(--sub); margin-bottom:6px; }
   #card[data-theme="modern"] .cd-eyebrow{ text-transform:uppercase; }
   #card[data-theme="pastel"] .cd-eyebrow,
   #card[data-theme="diary"] .cd-eyebrow,
-  #card[data-theme="dark"] .cd-eyebrow{ display:flex; align-items:center; gap:7px; letter-spacing:0.5px; }
+  #card[data-theme="dark"] .cd-eyebrow,
+  #card[data-theme="neon"] .cd-eyebrow,
+  #card[data-theme="lovely"] .cd-eyebrow,
+  #card[data-theme="vintage"] .cd-eyebrow,
+  #card[data-theme="mono"] .cd-eyebrow{ display:flex; align-items:center; gap:7px; letter-spacing:0.5px; }
   #card[data-theme="pastel"] .cd-eyebrow::before,
   #card[data-theme="diary"] .cd-eyebrow::before,
-  #card[data-theme="dark"] .cd-eyebrow::before{ content:''; width:5px; height:14px; border-radius:3px; background:var(--accent); display:inline-block; }
+  #card[data-theme="dark"] .cd-eyebrow::before,
+  #card[data-theme="neon"] .cd-eyebrow::before,
+  #card[data-theme="lovely"] .cd-eyebrow::before,
+  #card[data-theme="vintage"] .cd-eyebrow::before,
+  #card[data-theme="mono"] .cd-eyebrow::before{ content:''; width:5px; height:14px; border-radius:3px; background:var(--accent); display:inline-block; }
 
   .cd-name{ font-family:var(--font-head); font-weight:700; margin:2px 0 2px; letter-spacing:-0.5px; }
   #card[data-layout="horizontal"] .cd-name{ font-size:34px; }
@@ -310,9 +377,15 @@
   #card[data-theme="diary"] .cd-photo-frame{ border-radius:2px; padding:8px; background:#fff; box-shadow:0 3px 10px rgba(0,0,0,.15); }
   #card[data-theme="diary"] .cd-photo-frame .ph{ height:calc(100% - 0px); }
   #card[data-theme="dark"] .cd-photo-frame{ border-radius:14px; }
+  #card[data-theme="neon"] .cd-photo-frame{ border-radius:14px; }
+  #card[data-theme="lovely"] .cd-photo-frame{ border-radius:20px; }
+  #card[data-theme="vintage"] .cd-photo-frame{ border-radius:2px; padding:8px; background:#fff; box-shadow:0 3px 10px rgba(0,0,0,.15); }
+  #card[data-theme="vintage"] .cd-photo-frame .ph{ height:calc(100% - 0px); }
+  #card[data-theme="mono"] .cd-photo-frame{ border-radius:0; }
 
   .cd-tape{ display:none; position:absolute; top:-10px; left:44px; width:70px; height:22px; background:rgba(255,225,140,0.75); transform:rotate(-6deg); z-index:2; }
-  #card[data-theme="diary"] .cd-tape{ display:block; }
+  #card[data-theme="diary"] .cd-tape,
+  #card[data-theme="vintage"] .cd-tape{ display:block; }
 
   /* 메인 사진 풀블리드는 모던 미니멀 테마에서만 적용 */
   #card[data-theme="modern"] .cd-photo-outer{ padding:0; margin-top:16px; }
@@ -322,12 +395,18 @@
   #card[data-theme="modern"] .cd-tags{ display:flex; border-top:1px solid var(--border-c); border-bottom:1px solid var(--border-c); padding:0; margin:18px 0 0; }
   #card[data-theme="pastel"] .cd-tags,
   #card[data-theme="diary"] .cd-tags,
-  #card[data-theme="dark"] .cd-tags{ display:flex; flex-wrap:wrap; gap:7px; }
+  #card[data-theme="dark"] .cd-tags,
+  #card[data-theme="neon"] .cd-tags,
+  #card[data-theme="lovely"] .cd-tags,
+  #card[data-theme="vintage"] .cd-tags,
+  #card[data-theme="mono"] .cd-tags{ display:flex; flex-wrap:wrap; gap:7px; }
 
   .tag-pill{ background:var(--accent-soft); color:var(--accent-deep); font-size:12.5px; font-weight:700; padding:6px 13px; border-radius:999px; }
   #card[data-theme="modern"] .tag-pill{ flex:1; text-align:center; background:transparent; color:var(--fg); border-radius:0; padding:9px 4px; font-size:11px; font-weight:400; border-right:1px solid var(--border-c); }
   #card[data-theme="modern"] .tag-pill:last-child{ border-right:none; }
   #card[data-theme="dark"] .tag-pill{ border:1px solid #6f4f99; }
+  #card[data-theme="neon"] .tag-pill{ border:1px solid #1f4a55; }
+  #card[data-theme="vintage"] .tag-pill{ border:1px solid var(--accent-soft); }
 
   .cd-body{ padding:16px 26px 26px; }
 
@@ -338,11 +417,19 @@
   #card[data-theme="pastel"] .cd-box{ background:#fff; border:3px solid var(--accent-soft); border-radius:18px; }
   #card[data-theme="diary"] .cd-box{ background:transparent; border:none; border-top:1px dashed var(--border-c); border-radius:0; padding:14px 0 0; }
   #card[data-theme="dark"] .cd-box{ background:#1d1726; border:1px solid #322640; }
+  #card[data-theme="neon"] .cd-box{ background:#160e26; border:1px solid #2a1f45; }
+  #card[data-theme="lovely"] .cd-box{ background:#fff; border:3px solid var(--accent-soft); border-radius:20px; }
+  #card[data-theme="vintage"] .cd-box{ background:transparent; border:none; border-top:1px dashed var(--border-c); border-radius:0; padding:14px 0 0; }
+  #card[data-theme="mono"] .cd-box{ background:#fff; border:1.5px solid var(--border-c); border-radius:0; }
 
   .cd-box b{ display:block; font-size:10.5px; letter-spacing:1px; color:var(--sub); margin-bottom:6px; }
   #card[data-theme="pastel"] .cd-box b,
   #card[data-theme="diary"] .cd-box b,
-  #card[data-theme="dark"] .cd-box b{ color:var(--accent); font-size:11.5px; letter-spacing:0; }
+  #card[data-theme="dark"] .cd-box b,
+  #card[data-theme="neon"] .cd-box b,
+  #card[data-theme="lovely"] .cd-box b,
+  #card[data-theme="vintage"] .cd-box b,
+  #card[data-theme="mono"] .cd-box b{ color:var(--accent); font-size:11.5px; letter-spacing:0; }
   .cd-box ul{ margin:0; padding-left:16px; }
   .cd-box li{ margin-bottom:4px; }
   .cd-box li::marker{ color:var(--accent); }
@@ -351,7 +438,11 @@
   #card[data-theme="modern"] .cd-pairtitle{ padding-top:14px; border-top:1px solid var(--border-c); text-transform:uppercase; font-size:11px; letter-spacing:2px; color:var(--sub); }
   #card[data-theme="pastel"] .cd-pairtitle::before,
   #card[data-theme="diary"] .cd-pairtitle::before,
-  #card[data-theme="dark"] .cd-pairtitle::before{ content:''; width:5px; height:15px; border-radius:3px; background:var(--accent); display:inline-block; }
+  #card[data-theme="dark"] .cd-pairtitle::before,
+  #card[data-theme="neon"] .cd-pairtitle::before,
+  #card[data-theme="lovely"] .cd-pairtitle::before,
+  #card[data-theme="vintage"] .cd-pairtitle::before,
+  #card[data-theme="mono"] .cd-pairtitle::before{ content:''; width:5px; height:15px; border-radius:3px; background:var(--accent); display:inline-block; }
 
   .cd-pairgrid{ display:grid; gap:12px; align-items:start; }
   #card[data-pair-style="grid"] .cd-pairgrid{ grid-template-columns:repeat(4,1fr); }
@@ -359,12 +450,14 @@
 
   /* 페어 카드: 비율(3:4 또는 1:1)은 사용자가 고르고, 그 비율 안에서 object-fit:cover로
      "잘라서" 채운다 — cover는 절대 이미지를 늘리거나 눌리게 하지 않고 잘라내기만 한다. */
-  .pcard{ position:relative; border-radius:12px; overflow:hidden; background:#e8e2ea; aspect-ratio:var(--pair-ratio, 1/1); display:flex; align-items:center; justify-content:center; }
+  .pcard{ position:relative; border-radius:12px; overflow:hidden; background:#e8e2ea; aspect-ratio:var(--pair-ratio, 1/1); display:flex; align-items:center; justify-content:center; box-shadow:inset 0 -60px 45px -30px rgba(15,10,15,0.85); }
   #card[data-theme="modern"] .pcard{ border-radius:0; border:1px solid var(--border-c); }
   .pcard .pempty-label{ font-size:11px; color:var(--sub); }
   .pcard-img{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
   .pcard img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .pcard .pgrad{ position:absolute; left:0; right:0; bottom:0; height:55%; background:linear-gradient(to top, rgba(15,10,15,0.72) 0%, rgba(15,10,15,0.05) 70%, transparent 100%); }
+  /* 예전 방식(별도 그라데이션 레이어)은 html2canvas로 내보낼 때 가운데에 줄이 생기는
+     버그가 있어 제거하고, 위의 box-shadow(inset)로 동일한 어두운 하단 그라데이션 효과를 냄 */
+  .pcard .pgrad{ display:none; }
   .pcard .pinfo{ position:absolute; left:9px; right:9px; bottom:8px; color:#fff; }
   .pcard .pname{ font-size:12.5px; font-weight:700; text-shadow:0 1px 4px rgba(0,0,0,.4); }
   .pcard .ptag{ font-size:10px; opacity:.88; margin-top:1px; text-shadow:0 1px 4px rgba(0,0,0,.4); }
@@ -372,12 +465,16 @@
   /* ---- 리스트형 PAIR 카드: 왼쪽 사진 + 오른쪽 정보 (세로형은 항상 이 스타일, 가로형은 선택 가능) ---- */
   #card[data-pair-style="list"] .pcard{
     aspect-ratio:auto; flex-direction:row; align-items:center; justify-content:flex-start;
-    background:transparent; border-radius:12px; padding:6px; gap:10px;
+    background:transparent; border-radius:12px; padding:6px; gap:10px; box-shadow:none;
   }
   #card[data-theme="modern"][data-pair-style="list"] .pcard{ border:1px solid var(--border-c); border-radius:0; }
   #card[data-theme="pastel"][data-pair-style="list"] .pcard{ background:#fff; border:2px solid var(--accent-soft); }
   #card[data-theme="diary"][data-pair-style="list"] .pcard{ border-top:1px dashed var(--border-c); border-radius:0; padding:8px 0; }
   #card[data-theme="dark"][data-pair-style="list"] .pcard{ background:#1d1726; border:1px solid #322640; }
+  #card[data-theme="neon"][data-pair-style="list"] .pcard{ background:#160e26; border:1px solid #2a1f45; }
+  #card[data-theme="lovely"][data-pair-style="list"] .pcard{ background:#fff; border:2px solid var(--accent-soft); }
+  #card[data-theme="vintage"][data-pair-style="list"] .pcard{ border-top:1px dashed var(--border-c); border-radius:0; padding:8px 0; }
+  #card[data-theme="mono"][data-pair-style="list"] .pcard{ background:#fff; border:1px solid var(--border-c); border-radius:0; }
   #card[data-pair-style="list"] .pcard-img{
     width:56px; height:56px; flex-shrink:0; border-radius:10px; overflow:hidden; background:#e8e2ea;
   }
@@ -677,6 +774,9 @@
 
     <div class="export-bar">
       <button class="btn block" onclick="exportPNG()">🖼 이미지로 저장 (PNG)</button>
+      <button class="btn ghost block" onclick="saveProfileJSON()">💾 작업 저장 (JSON)</button>
+      <button class="btn ghost block" onclick="document.getElementById('loadJsonInput').click()">📂 저장 파일 불러오기</button>
+      <input type="file" id="loadJsonInput" accept="application/json" style="display:none" onchange="loadProfileJSON(this)">
     </div>
     </div>
   </div>
@@ -778,7 +878,11 @@ const THEMES = [
   { id:'modern', name:'모던 미니멀', cls:'sw-modern' },
   { id:'pastel', name:'파스텔 팝',   cls:'sw-pastel' },
   { id:'diary',  name:'감성 다이어리', cls:'sw-diary' },
-  { id:'dark',   name:'다크 무드',   cls:'sw-dark' }
+  { id:'dark',   name:'다크 무드',   cls:'sw-dark' },
+  { id:'neon',   name:'네온 시티',   cls:'sw-neon' },
+  { id:'lovely', name:'러블리 핑크', cls:'sw-lovely' },
+  { id:'vintage',name:'빈티지 필름', cls:'sw-vintage' },
+  { id:'mono',   name:'모노크롬',   cls:'sw-mono' }
 ];
 
 function renderThemeGrid(){
@@ -1090,7 +1194,7 @@ function applyColorFmt(key, i, kind, value){
 
 // ---------------- PAIRS ----------------
 function addPair(){
-  state.pairs.push({ image:null, name:"이름", tag:"#해시태그" });
+  state.pairs.push({ image:null, name:"", tag:"" });
   state.activePairTab = state.pairs.length - 1;
   render();
 }
@@ -1554,6 +1658,87 @@ function exportPNG(){
       stage.style.transform = prevTransform;
     }
   });
+}
+
+// ---------------- SAVE / LOAD (JSON) ----------------
+// 이미지가 전부 base64로 state 안에 저장되므로, state 전체를 JSON으로
+// 내보내면 사진/스티커까지 포함해서 그대로 다시 불러올 수 있어요.
+function saveProfileJSON(){
+  const data = JSON.parse(JSON.stringify(state));
+  data.name = document.getElementById('nameInput').value;
+  data.handle = document.getElementById('handleInput').value;
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  link.download = `profile-card-data-${stamp}.json`;
+  link.href = url;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadProfileJSON(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const data = JSON.parse(e.target.result);
+      applyLoadedState(data);
+    }catch(err){
+      alert('파일을 불러오지 못했어요. 이 편집기에서 저장한 JSON 파일이 맞는지 확인해주세요.');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function applyLoadedState(data){
+  // name/handle은 state가 아니라 입력창(DOM)에 직접 저장되는 값
+  document.getElementById('nameInput').value = data.name || '이름';
+  document.getElementById('handleInput').value = data.handle || '@handle';
+
+  const defaults = {
+    activeEditorTab:'theme', theme:'modern', layout:'horizontal', pairStyle:'grid', pairRatio:'4/3',
+    colorOverride:{ bg:null, fg:null, accent:null }, fontOverride:null, photo:null, photoPos:{ x:50, y:50 },
+    pairEnabled:true, tags:["#HL","#ALL","#CBC","#OPEN"], notices:[], cautions:[],
+    noticeTitle:'안내사항', cautionTitle:'주의사항', pairs:[{ image:null, name:"", tag:"" }],
+    activePairTab:0, stickers:[], selectedStickerId:null
+  };
+  Object.keys(state).forEach(k => delete state[k]);
+  Object.assign(state, defaults, data);
+  delete state.name;
+  delete state.handle;
+  if(!state.colorOverride) state.colorOverride = { bg:null, fg:null, accent:null };
+  if(!state.photoPos) state.photoPos = { x:50, y:50 };
+  if(!Array.isArray(state.pairs) || !state.pairs.length) state.pairs = [{ image:null, name:"", tag:"" }];
+
+  const card = document.getElementById('card');
+  card.setAttribute('data-theme', state.theme);
+  card.setAttribute('data-layout', state.layout);
+  document.getElementById('editorPanel').setAttribute('data-theme', state.theme);
+  const fab = document.getElementById('mobileEditFab');
+  if(fab) fab.setAttribute('data-theme', state.theme);
+
+  applyColorOverrides();
+  document.getElementById('bgColorInput').value = state.colorOverride.bg || currentThemeColor('--bg', '#ffffff');
+  document.getElementById('fgColorInput').value = state.colorOverride.fg || currentThemeColor('--fg', '#161616');
+  document.getElementById('accentColorInput').value = state.colorOverride.accent || currentThemeColor('--accent', '#ef5f83');
+
+  const fontSel = document.getElementById('fontFamily');
+  if(state.fontOverride){
+    card.style.setProperty('--font-head', state.fontOverride);
+    card.style.setProperty('--font-body', state.fontOverride);
+    if(fontSel) fontSel.value = state.fontOverride;
+  } else {
+    card.style.removeProperty('--font-head');
+    card.style.removeProperty('--font-body');
+    if(fontSel) fontSel.selectedIndex = 0;
+  }
+
+  updatePairStyleAttr();
+  render();
+  setEditorTab(state.activeEditorTab || 'theme');
 }
 
 render();
