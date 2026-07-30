@@ -410,6 +410,10 @@
 
   /* ---------- 모바일 편집 진입 버튼(FAB) ---------- */
   .mobile-edit-fab{ display:none; }
+  .mobile-edit-fab[data-theme="modern"]{ background:#161616; color:#fff; }
+  .mobile-edit-fab[data-theme="pastel"]{ background:#e8794f; color:#fff; }
+  .mobile-edit-fab[data-theme="diary"]{ background:#a8763f; color:#fff; }
+  .mobile-edit-fab[data-theme="dark"]{ background:#b98cff; color:#141018; }
 
   @media (max-width: 980px){
     .app{ grid-template-columns:1fr; }
@@ -442,8 +446,9 @@
       display:flex; align-items:center; gap:7px;
       position:fixed; right:18px; bottom:18px; z-index:150;
       border:none; border-radius:999px; padding:14px 20px;
-      background:var(--ui-accent,#ef5f83); color:#fff; font-weight:700; font-size:14px;
+      font-weight:700; font-size:14px;
       font-family:'Gowun Dodum','Pretendard',sans-serif; box-shadow:0 8px 22px rgba(0,0,0,.25); cursor:pointer;
+      transition:background .2s ease, color .2s ease;
     }
   }
 
@@ -660,7 +665,7 @@
 
 </div>
 
-<button type="button" id="mobileEditFab" class="mobile-edit-fab" onclick="openMobileEditor()">✏️ 편집하기</button>
+<button type="button" id="mobileEditFab" class="mobile-edit-fab" data-theme="modern" onclick="openMobileEditor()">✏️ 편집하기</button>
 
 <script>
 // ---------------- 모바일 편집창 팝업 ----------------
@@ -732,6 +737,8 @@ function setTheme(id){
   state.theme = id;
   document.getElementById('card').setAttribute('data-theme', id);
   document.getElementById('editorPanel').setAttribute('data-theme', id);
+  const fab = document.getElementById('mobileEditFab');
+  if(fab) fab.setAttribute('data-theme', id);
   resetColorOverrides();
   resetFontOverride();
   renderThemeGrid();
@@ -868,10 +875,9 @@ function setPairRatio(r){
 function updatePairGridColumns(){
   const grid = document.getElementById('pvPairs');
   if(!grid) return;
-  // 리스트형은 1열, 그리드형은 4열 고정(비율과 상관없이 카드가 과도하게 커지는 문제 방지)
-  // 단, 모바일 화면에서는 그리드형 카드가 너무 작아지지 않도록 2열로 줄임
-  let cols = effectivePairStyle() === 'list' ? 1 : 4;
-  if(cols === 4 && window.innerWidth <= 560) cols = 2;
+  // 그리드형은 항상 4열, 리스트형은 1열 — PC와 완전히 동일한 구조를 유지하고,
+  // 모바일에서는 이 구조를 그대로 축소(scale)해서 보여줌 (열 개수 자체는 절대 바꾸지 않음)
+  const cols = effectivePairStyle() === 'list' ? 1 : 4;
   grid.style.gridTemplateColumns = `repeat(${cols},1fr)`;
 }
 window.addEventListener('resize', ()=>{ updatePairGridColumns(); fitStageToScreen(); });
