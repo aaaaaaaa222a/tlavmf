@@ -207,6 +207,7 @@
 
   /* ---- 메인 사진 위치 조절 ---- */
   .photo-pos-hint{ font-size:11px; color:var(--ui-sub); line-height:1.5; margin:8px 0 0; }
+  .cd-photo-frame.pos-draggable{ touch-action:none; }
   .cd-photo-frame.pos-draggable .ph{ cursor:grab; }
   .cd-photo-frame.pos-draggable .ph:active{ cursor:grabbing; }
   .photo-reset-btn{ margin-top:8px; }
@@ -525,6 +526,7 @@
       display:flex; flex-direction:column;
       position:fixed; left:0; right:0; bottom:0; top:auto; width:auto;
       height:76vh; max-height:76vh;
+      height:86dvh; max-height:86dvh; /* dvh 지원 브라우저에서는 주소창 유무와 무관하게 안정적으로 계산됨 */
       z-index:200;
       padding:0; overflow:hidden;
       border-radius:22px 22px 0 0;
@@ -585,6 +587,7 @@
       background: var(--ui-panel-t, rgba(255,255,255,.94));
       -webkit-backdrop-filter: blur(18px) saturate(180%);
       backdrop-filter: blur(18px) saturate(180%);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     body.mobile-editor-lock{ overflow:hidden; }
@@ -617,6 +620,13 @@
     .sticker .stk-del{ width:28px; height:28px; font-size:13px; }
     .sticker .stk-resize{ width:22px; height:22px; }
     .sticker .stk-rotate{ width:20px; height:20px; }
+  }
+
+  /* ---------- iOS Safari: 인풋 포커스시 자동 확대(줌) 방지 ----------
+     16px 미만 폰트 크기의 입력창에 포커스하면 사파리가 화면 전체를 확대해버려서
+     편집창이 갑자기 커지고 위치가 틀어지는 것처럼 느껴짐. 모바일에서만 16px로 올림. */
+  @media (max-width: 980px){
+    .editor input[type=text], .editor textarea, .editor select, .editor .rte{ font-size:16px; }
   }
 </style>
 </head>
@@ -1628,9 +1638,18 @@ function render(){
 }
 
 // ---------------- EXPORT ----------------
-function exportPNG(){
+// 아이폰 사파리는 <a download> 를 통한 강제 다운로드를 지원하지 않는 경우가 많아서
+// (탭이 새로 열리거나 아무 반응이 없음), 가능하면 Web Share 시트("사진에 저장")를 쓰고,
+// 그마저 안 되면 새 탭으로 이미지를 열어서 길게 눌러 저장하도록 안내한다.
+function isIOSDevice(){
+  return /iP(hone|od|ad)/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS
+}
+
+async function exportPNG(){
   const stage = document.getElementById('stage');
   const scaleWrap = document.getElementById('stageScaleWrap');
+  const exportBtn = document.querySelector('.export-bar .btn.block');
   state.selectedStickerId = null;
   render();
   // 모바일 화면 축소용 transform은 내보내기에 반영되면 안 되므로 잠시 해제
@@ -1641,23 +1660,58 @@ function exportPNG(){
     stage.style.transform = '';
   }
   stage.classList.add('exporting');
-  html2canvas(stage, {scale: 2, useCORS:true, backgroundColor:null}).then(canvas=>{
+  const restoreStage = () => {
     stage.classList.remove('exporting');
     if(hadScale){
       scaleWrap.classList.add('is-scaled');
       stage.style.transform = prevTransform;
     }
-    const link = document.createElement('a');
-    link.download = 'profile-card.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }).catch(()=>{
-    stage.classList.remove('exporting');
-    if(hadScale){
-      scaleWrap.classList.add('is-scaled');
-      stage.style.transform = prevTransform;
-    }
-  });
+  };
+  const prevLabel = exportBtn ? exportBtn.textContent : null;
+  if(exportBtn){ exportBtn.textContent = '이미지 만드는 중...'; exportBtn.disabled = true; }
+
+  try{
+    // 폰트가 아직 로드되지 않은 상태로 캡처하면 글자가 깨져 보일 수 있어 미리 대기
+    if(document.fonts && document.fonts.ready){ await document.fonts.ready; }
+    const canvas = await html2canvas(stage, {scale: 2, useCORS:true, backgroundColor:null});
+    restoreStage();
+
+    canvas.toBlob(async (blob) => {
+      if(exportBtn){ exportBtn.textContent = prevLabel; exportBtn.disabled = false; }
+      if(!blob){ alert('이미지 생성에 실패했어요. 다시 시도해주세요.'); return; }
+
+      const file = new File([blob], 'profile-card.png', { type:'image/png' });
+
+      // 1) 아이폰/아이패드/공유시트를 지원하는 브라우저: "사진에 저장"으로 바로 내려받기
+      if(navigator.canShare && navigator.canShare({ files:[file] })){
+        try{
+          await navigator.share({ files:[file], title:'프로필 카드' });
+          return;
+        }catch(shareErr){
+          // 사용자가 공유 시트를 취소한 경우 등 - 아래 폴백으로 진행
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      if(isIOSDevice()){
+        // 2) 공유 시트가 없는 구버전 사파리 폴백: 새 탭에 이미지를 열어 길게 눌러 저장
+        window.open(url, '_blank');
+        alert('새 탭에 이미지가 열렸어요. 이미지를 길게 눌러 "사진에 저장"을 선택해주세요.');
+      } else {
+        const link = document.createElement('a');
+        link.download = 'profile-card.png';
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+      setTimeout(()=>URL.revokeObjectURL(url), 30000);
+    }, 'image/png');
+  }catch(err){
+    restoreStage();
+    if(exportBtn){ exportBtn.textContent = prevLabel; exportBtn.disabled = false; }
+    alert('이미지 생성에 실패했어요. 다시 시도해주세요.');
+  }
 }
 
 // ---------------- SAVE / LOAD (JSON) ----------------
