@@ -570,10 +570,10 @@
       width:32px; height:32px; border-radius:50%; font-size:14px; cursor:pointer; flex-shrink:0;
     }
 
-    /* 스크롤 영역: 헤더 아래 남은 공간을 전부 차지하며 독립적으로 스크롤됨 */
+    /* 스크롤 영역: 헤더와 하단 저장 바 사이 남은 공간을 차지하며 독립적으로 스크롤됨 */
     .editor-scroll{
       flex:1 1 auto; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch;
-      padding:20px 24px 76px;
+      padding:20px 24px 20px;
     }
 
     .editor-tabs{
@@ -583,11 +583,14 @@
       -webkit-backdrop-filter: blur(18px) saturate(180%);
       backdrop-filter: blur(18px) saturate(180%);
     }
+    /* 저장 바는 스크롤 영역 밖의 독립된 flex 항목 — 항상 바텀시트 맨 아래 고정, 스크롤과 무관 */
     .export-bar{
+      position:static; flex:0 0 auto;
       background: var(--ui-panel-t, rgba(255,255,255,.94));
       -webkit-backdrop-filter: blur(18px) saturate(180%);
       backdrop-filter: blur(18px) saturate(180%);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
+      margin-top:0; padding:12px 24px calc(14px + env(safe-area-inset-bottom, 0px));
+      border-top:1px solid var(--ui-line);
     }
 
     body.mobile-editor-lock{ overflow:hidden; }
@@ -605,8 +608,9 @@
 
   /* ---------- 모바일 최적화(편집창 UI만 대상, 카드/미리보기 비율은 그대로 유지) ---------- */
   @media (max-width: 560px){
-    .editor-scroll{ padding:16px 16px 76px; }
+    .editor-scroll{ padding:16px 16px 16px; }
     .editor-tabs{ margin:-16px -16px 16px; padding:14px 16px 10px; }
+    .export-bar{ padding:12px 16px calc(14px + env(safe-area-inset-bottom, 0px)); }
     .editor h1{ font-size:19px; }
     .editor .lead{ font-size:12px; margin-bottom:18px; }
     .editor-tabs{ gap:5px; padding-bottom:12px; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; }
@@ -782,12 +786,12 @@
       </div>
     </section>
 
+    </div>
     <div class="export-bar">
       <button class="btn block" onclick="exportPNG()">🖼 이미지로 저장 (PNG)</button>
       <button class="btn ghost block" onclick="saveProfileJSON()">💾 작업 저장 (JSON)</button>
       <button class="btn ghost block" onclick="document.getElementById('loadJsonInput').click()">📂 저장 파일 불러오기</button>
       <input type="file" id="loadJsonInput" accept="application/json" style="display:none" onchange="loadProfileJSON(this)">
-    </div>
     </div>
   </div>
 
