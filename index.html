@@ -1157,13 +1157,21 @@ function buildListEditor(key){
           <button type="button" title="밑줄" onmousedown="event.preventDefault()" onclick="applyInlineFmt('${key}',${i},'underline')"><u>U</u></button>
           <input type="color" class="rte-color" title="글자색" value="#c73f66" onmousedown="saveSelection('${id}')" oninput="applyColorFmt('${key}',${i},'fore',this.value)">
           <input type="color" class="rte-color" title="하이라이트" value="#fff3b0" onmousedown="saveSelection('${id}')" oninput="applyColorFmt('${key}',${i},'hilite',this.value)">
+          <button type="button" title="서식 제거 (선택한 부분이 없으면 전체 적용)" onmousedown="event.preventDefault()" onclick="clearFormat('${key}',${i})">🧹</button>
         </div>
         <div class="rte" id="${id}" contenteditable="true" data-placeholder="문장을 입력하세요"
-          oninput="updateRTE('${key}',${i},this.innerHTML)">${html}</div>
+          oninput="updateRTE('${key}',${i},this.innerHTML)" onpaste="handleRtePaste(event)">${html}</div>
       </div>
       <button class="iconbtn" onclick="removeListItem('${key}',${i})">✕</button>
     </div>`;
   }).join('') || '<div class="empty-note">문장을 추가해보세요</div>';
+}
+
+// ---- 붙여넣기: 서식(굵기/색/링크 등) 전부 제거하고 순수 텍스트만 삽입 ----
+function handleRtePaste(e){
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+  document.execCommand('insertText', false, text);
 }
 
 // ---- 서식 적용 (선택 영역 저장/복원 후 execCommand) ----
@@ -1203,6 +1211,24 @@ function applyColorFmt(key, i, kind, value){
     const ok = document.execCommand('hiliteColor', false, value);
     if(!ok) document.execCommand('backColor', false, value);
   }
+  state[key][i] = el.innerHTML;
+}
+
+// ---- 서식 제거: 선택된 범위가 있으면 그 부분만, 없으면 문장 전체의 굵기/취소선/밑줄/색을 제거 ----
+function clearFormat(key, i){
+  const id = `rte-${key}-${i}`;
+  const el = document.getElementById(id);
+  el.focus();
+  const sel = window.getSelection();
+  const hasSelectionInside = sel && sel.rangeCount > 0 && !sel.isCollapsed && el.contains(sel.getRangeAt(0).commonAncestorContainer);
+  if(!hasSelectionInside){
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  document.execCommand('removeFormat', false, null);
+  document.execCommand('hiliteColor', false, 'transparent'); // removeFormat만으로는 하이라이트 배경색이 남는 브라우저가 있어 별도로 제거
   state[key][i] = el.innerHTML;
 }
 
